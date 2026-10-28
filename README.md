@@ -10,7 +10,7 @@ The application is intentionally focused on one configured target service. It do
 - Display deployment ID, creation time, and normalized lifecycle status.
 - Deploy or redeploy the configured service.
 - Remove the latest running or sleeping deployment.
-- Poll Railway every eight seconds while the browser tab is visible.
+- Poll Railway every five seconds while the browser tab is visible.
 - Handle regular Docker services and Serverless services in `SLEEPING` state.
 - Keep Railway credentials exclusively on the server.
 - Coalesce concurrent identical actions into one Railway mutation.
@@ -111,15 +111,15 @@ To copy the target IDs, open the Railway project, press `Ctrl+K` (`Cmd+K` on mac
 
 ### Complete variable reference
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `RAILWAY_API_TOKEN` | Conditional | Account or workspace API token. |
-| `RAILWAY_TOKEN` | Conditional | Project token scoped to the target environment. |
-| `TARGET_RAILWAY_SERVICE_ID` | Yes | Service controlled by the dashboard. |
-| `TARGET_RAILWAY_ENVIRONMENT_ID` | Yes | Environment containing the service instance. |
-| `RAILWAY_API_URL` | No | GraphQL endpoint override. |
-| `PORT` | No | NestJS port. Defaults to `3000`. |
-| `CORS_ORIGIN` | No | Allowed UI origin during development. Defaults to `http://localhost:5173`. |
+| Variable                        | Required    | Description                                                                |
+| ------------------------------- | ----------- | -------------------------------------------------------------------------- |
+| `RAILWAY_API_TOKEN`             | Conditional | Account or workspace API token.                                            |
+| `RAILWAY_TOKEN`                 | Conditional | Project token scoped to the target environment.                            |
+| `TARGET_RAILWAY_SERVICE_ID`     | Yes         | Service controlled by the dashboard.                                       |
+| `TARGET_RAILWAY_ENVIRONMENT_ID` | Yes         | Environment containing the service instance.                               |
+| `RAILWAY_API_URL`               | No          | GraphQL endpoint override.                                                 |
+| `PORT`                          | No          | NestJS port. Defaults to `3000`.                                           |
+| `CORS_ORIGIN`                   | No          | Allowed UI origin during development. Defaults to `http://localhost:5173`. |
 
 ## Local development
 
@@ -136,15 +136,15 @@ This starts:
 
 ### Available commands
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the UI and backend in watch mode. |
-| `npm run server` | Start only NestJS in watch mode. |
-| `npm run server:debug` | Start NestJS with the Node inspector. |
-| `npm run ui` | Start only the Vite development server. |
-| `npm run build` | Build the server and UI for production. |
-| `npm start` | Run the compiled production server. |
-| `npm test` | Run the Railway service unit tests. |
+| Command                | Description                             |
+| ---------------------- | --------------------------------------- |
+| `npm run dev`          | Start the UI and backend in watch mode. |
+| `npm run server`       | Start only NestJS in watch mode.        |
+| `npm run server:debug` | Start NestJS with the Node inspector.   |
+| `npm run ui`           | Start only the Vite development server. |
+| `npm run build`        | Build the server and UI for production. |
+| `npm start`            | Run the compiled production server.     |
+| `npm test`             | Run the Railway service unit tests.     |
 
 ## HTTP API
 
@@ -200,14 +200,14 @@ The backend reads the latest deployment ID and calls `deploymentRemove`. The UI 
 
 Railway deployments are asynchronous. A successful mutation means Railway accepted the operation; it does not mean the container is already available. RailControl continues polling the latest deployment until Railway reports the resulting state.
 
-| Railway status | UI meaning | Start | Stop |
-| --- | --- | --- | --- |
-| `ACTIVE`, `SUCCESS` | Running | Disabled | Enabled |
-| `INITIALIZING`, `BUILDING`, `DEPLOYING` | Starting | Disabled | Disabled |
-| `SLEEPING` | Serverless container sleeping | Enabled | Enabled |
-| `CRASHED` | Container exited unexpectedly | Enabled | Enabled |
-| `REMOVING` | Deployment is stopping | Disabled | Disabled |
-| `REMOVED`, `FAILED`, `COMPLETED`, `STOPPED` | Not running | Enabled | Disabled |
+| Railway status                              | UI meaning                    | Start    | Stop     |
+| ------------------------------------------- | ----------------------------- | -------- | -------- |
+| `ACTIVE`, `SUCCESS`                         | Running                       | Disabled | Enabled  |
+| `INITIALIZING`, `BUILDING`, `DEPLOYING`     | Starting                      | Disabled | Disabled |
+| `SLEEPING`                                  | Serverless container sleeping | Enabled  | Enabled  |
+| `CRASHED`                                   | Container exited unexpectedly | Enabled  | Enabled  |
+| `REMOVING`                                  | Deployment is stopping        | Disabled | Disabled |
+| `REMOVED`, `FAILED`, `COMPLETED`, `STOPPED` | Not running                   | Enabled  | Disabled |
 
 For a Docker service with Railway Serverless enabled, `SLEEPING` represents a valid deployment that has scaled down after inactivity. Incoming traffic normally wakes it. RailControl also allows a deliberate redeployment through **Start / wake**, or complete deployment removal through **Stop**.
 
